@@ -1,5 +1,6 @@
 package com.naleid.sample;
 
+import dagger.ObjectGraph;
 import spark.servlet.SparkApplication;
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -9,6 +10,8 @@ import spark.Route;
 
 public class Api implements SparkApplication {
 
+    ApiController apiController;
+
     public static void main(String[] args) {
         SparkApplication app = new Api();
         app.init();
@@ -16,15 +19,9 @@ public class Api implements SparkApplication {
 
     @Override
     public void init() {
-
-        System.out.println("Starting up SparkApplication");
-
-        get(new Route("/api/hello/:name") {
-            @Override
-            public Object handle(Request request, Response response) {
-                return "Hello, " + request.params(":name") + "!";
-            }
-        });
+        ObjectGraph objectGraph = ObjectGraph.create(new ApiModule());
+        apiController = objectGraph.get(ApiController.class);
+        apiController.createRoutes();
     }
 
 }
